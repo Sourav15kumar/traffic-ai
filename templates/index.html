@@ -1,0 +1,474 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+<title>Smart Traffic AI</title>
+
+<style>
+body {
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43);
+    color:white;
+    text-align:center;
+    transition:0.3s;
+}
+
+/* DARK/LIGHT MODE */
+.light {
+    background:#f5f5f5;
+    color:black;
+}
+
+/* HEADER */
+h1 {
+    font-size:40px;
+    margin:20px;
+}
+
+/* BUTTONS */
+.top-btn {
+    padding:10px 20px;
+    margin:5px;
+    border:none;
+    border-radius:20px;
+    background:#ff9800;
+    cursor:pointer;
+}
+
+/* CARD */
+.container {
+    margin:auto;
+    width:340px;
+    padding:25px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+}
+
+/* INPUT */
+input,select {
+    width:90%;
+    padding:12px;
+    margin:10px;
+    border:none;
+    border-radius:10px;
+}
+
+/* ROAD */
+.road {
+    width:100%;
+    height:110px;
+    background:#2c2c2c;
+    position:relative;
+    overflow:hidden;
+}
+
+/* LINE */
+.line {
+    position:absolute;
+    width:200%;
+    height:5px;
+    top:50%;
+    background:repeating-linear-gradient(
+        to right,white 0,white 50px,transparent 50px,transparent 100px
+    );
+    animation:move 1.5s linear infinite;
+}
+
+@keyframes move {
+    from {transform:translateX(0);}
+    to {transform:translateX(-100px);}
+}
+
+/* CAR */
+.car {
+    width:80px;
+    position:absolute;
+    top:15px;
+    left:-100px;
+    transform:rotateY(180deg);
+    transition:3s linear;
+}
+
+.move { left:100%; }
+
+/* RESULT */
+#result {
+    font-size:22px;
+    margin-top:15px;
+}
+
+/* MAP */
+iframe {
+    margin-top:20px;
+    border-radius:15px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚦 SMART TRAFFIC AI</h1>
+
+<button class="top-btn" onclick="location.href='/graph'">📊 Dashboard</button>
+<button class="top-btn" onclick="toggleMode()">🌙 Mode</button>
+
+<div class="container">
+
+<form id="form">
+<input type="number" name="time" placeholder="Time" required>
+
+<select name="day" required>
+<option value="" disabled selected>Select Day</option>
+<option>Monday</option>
+<option>Tuesday</option>
+<option>Wednesday</option>
+<option>Thursday</option>
+<option>Friday</option>
+<option>Saturday</option>
+<option>Sunday</option>
+</select>
+
+<input type="number" name="vehicles" placeholder="Vehicles" required>
+<input type="text" id="city" placeholder="Enter City" required>
+
+<button type="submit">Predict</button>
+</form>
+
+<div id="result"></div>
+
+</div>
+
+<div class="road">
+<div class="line"></div>
+<img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" class="car" id="car">
+</div>
+
+<iframe id="map" width="90%" height="250"
+src="https://maps.google.com/maps?q=delhi&output=embed"></iframe>
+
+<script>
+const form=document.getElementById("form");
+const car=document.getElementById("car");
+const resultText=document.getElementById("result");
+
+function toggleMode(){
+    document.body.classList.toggle("light");
+}
+
+form.onsubmit=async(e)=>{
+    e.preventDefault();
+
+    let city=document.getElementById("city").value;
+
+    document.getElementById("map").src =
+    "https://maps.google.com/maps?q="+encodeURIComponent(city)+"&output=embed";
+
+    car.classList.remove("move");
+
+    let data=new FormData(form);
+
+    let res=await fetch("/predict",{method:"POST",body:data});
+    let result=await res.text();
+
+    setTimeout(()=>car.classList.add("move"),200);
+
+    setTimeout(()=>{
+        if(result==="High"){
+            resultText.innerHTML="🚨 High Traffic Alert!";
+            alert("High Traffic Detected 🚨");
+        }
+        else if(result==="Medium"){
+            resultText.innerHTML="⚠️ Medium Traffic";
+        }
+        else{
+            resultText.innerHTML="✅ Smooth Traffic";
+        }
+    },3000);
+}
+</script>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Traffic AI</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43);
+    color:white;
+    text-align:center;
+    transition:0.3s;
+}
+
+/* LIGHT MODE */
+.light {
+    background:#f5f5f5;
+    color:black;
+}
+
+/* HEADER */
+h1 {
+    font-size:36px;
+    margin:20px;
+}
+
+/* BUTTONS */
+.top-btn {
+    padding:10px 18px;
+    margin:5px;
+    border:none;
+    border-radius:25px;
+    background:linear-gradient(135deg,#ff9800,#ff5722);
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.top-btn:hover {
+    transform:scale(1.05);
+    box-shadow:0 5px 15px rgba(255,152,0,0.5);
+}
+
+/* CARD */
+.container {
+    margin:auto;
+    width:90%;
+    max-width:350px;
+    padding:20px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+}
+
+/* INPUT */
+input,select {
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    border-radius:10px;
+}
+
+/* 🔥 PREDICT BUTTON */
+.predict-btn {
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(135deg,#ff9800,#ff5722);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:0.3s;
+}
+
+.predict-btn:hover {
+    transform:scale(1.05);
+    box-shadow:0 6px 18px rgba(255,152,0,0.6);
+}
+
+.predict-btn:active {
+    transform:scale(0.95);
+}
+
+/* RIPPLE EFFECT */
+.ripple {
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.6);
+    transform:scale(0);
+    animation:ripple 0.6s linear;
+}
+
+@keyframes ripple {
+    to {
+        transform:scale(4);
+        opacity:0;
+    }
+}
+
+/* ROAD */
+.road {
+    width:100%;
+    height:100px;
+    background:#2c2c2c;
+    position:relative;
+    overflow:hidden;
+}
+
+/* LINE */
+.line {
+    position:absolute;
+    width:200%;
+    height:4px;
+    top:50%;
+    background:repeating-linear-gradient(
+        to right,white 0,white 50px,transparent 50px,transparent 100px
+    );
+    animation:move 1.5s linear infinite;
+}
+
+@keyframes move {
+    from {transform:translateX(0);}
+    to {transform:translateX(-100px);}
+}
+
+/* CAR */
+.car {
+    width:70px;
+    position:absolute;
+    top:15px;
+    left:-100px;
+    transform:rotateY(180deg);
+    transition:3s linear;
+}
+.move { left:100%; }
+
+/* RESULT */
+#result {
+    font-size:20px;
+    margin-top:15px;
+}
+
+/* MAP */
+iframe {
+    width:95%;
+    height:220px;
+    margin-top:20px;
+    border-radius:15px;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width:600px) {
+
+    h1 {
+        font-size:26px;
+    }
+
+    .top-btn {
+        padding:8px 14px;
+        font-size:14px;
+    }
+
+    .car {
+        width:55px;
+    }
+
+    .road {
+        height:80px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚦 SMART TRAFFIC AI</h1>
+
+<button class="top-btn" onclick="location.href='/graph'">📊 Dashboard</button>
+<button class="top-btn" onclick="toggleMode()">🌙 Mode</button>
+
+<div class="container">
+
+<form id="form">
+
+<input type="number" name="time" placeholder="Time" required>
+
+<select name="day" required>
+<option value="" disabled selected>Select Day</option>
+<option>Monday</option>
+<option>Tuesday</option>
+<option>Wednesday</option>
+<option>Thursday</option>
+<option>Friday</option>
+<option>Saturday</option>
+<option>Sunday</option>
+</select>
+
+<input type="number" name="vehicles" placeholder="Vehicles" required>
+<input type="text" id="city" placeholder="Enter City" required>
+
+<button class="predict-btn" id="predictBtn">🚀 Predict</button>
+
+</form>
+
+<div id="result"></div>
+
+</div>
+
+<div class="road">
+<div class="line"></div>
+<img src="https://cdn-icons-png.flaticon.com/512/744/744465.png" class="car" id="car">
+</div>
+
+<iframe id="map"
+src="https://maps.google.com/maps?q=delhi&output=embed"></iframe>
+
+<script>
+const form=document.getElementById("form");
+const car=document.getElementById("car");
+const resultText=document.getElementById("result");
+const btn=document.getElementById("predictBtn");
+
+function toggleMode(){
+    document.body.classList.toggle("light");
+}
+
+/* RIPPLE */
+btn.addEventListener("click",function(e){
+    const circle=document.createElement("span");
+    const d=Math.max(this.clientWidth,this.clientHeight);
+    circle.style.width=circle.style.height=d+"px";
+    circle.style.left=e.clientX-this.offsetLeft-d/2+"px";
+    circle.style.top=e.clientY-this.offsetTop-d/2+"px";
+    circle.classList.add("ripple");
+    this.appendChild(circle);
+    setTimeout(()=>circle.remove(),600);
+});
+
+form.onsubmit=async(e)=>{
+    e.preventDefault();
+
+    let city=document.getElementById("city").value;
+
+    document.getElementById("map").src =
+    "https://maps.google.com/maps?q="+encodeURIComponent(city)+"&output=embed";
+
+    car.classList.remove("move");
+
+    let data=new FormData(form);
+
+    let res=await fetch("/predict",{method:"POST",body:data});
+    let result=await res.text();
+
+    setTimeout(()=>car.classList.add("move"),200);
+
+    setTimeout(()=>{
+        if(result==="High"){
+            resultText.innerHTML="🚨 High Traffic Alert!";
+        }
+        else if(result==="Medium"){
+            resultText.innerHTML="⚠️ Medium Traffic";
+        }
+        else{
+            resultText.innerHTML="✅ Smooth Traffic";
+        }
+    },3000);
+}
+</script>
+
+</body>
+</html>
